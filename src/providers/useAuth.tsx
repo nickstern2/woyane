@@ -51,7 +51,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   // Fetch User Data from Firestore
   const fetchUserData = async (firebaseUser: User) => {
     const token = await getIdToken(firebaseUser, true);
-    console.log("!User Token:", token);
 
     const userDocRef = doc(db, "users", firebaseUser.uid);
     const userSnap = await getDoc(userDocRef);
@@ -66,7 +65,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   // Listen for Auth Changes & Set `authState`
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
-      console.log("!!Auth Change Detected:", firebaseUser);
       setUser(firebaseUser);
 
       if (!firebaseUser) {
