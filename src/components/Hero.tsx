@@ -2,19 +2,35 @@ import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import VimeoPlayer from "./VimeoPlayer";
 import PurchaseModal from "./PurchaseModal";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../providers/useAuth";
 import { description, title } from "../utils/consts";
+import { RegisterOrLoginModal } from "./RegisterOrLoginModal";
 
-const Hero: React.FC = () => {
+type HeroProps = {
+  isNavModalOpen: boolean;
+  setIsNavModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
+  const { user, loading, authState, refetchUserData } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
-
+  const [loginErrors, setLoginErrors] = useState(false);
+  console.log("!authState", authState);
   const handleOpenModal = () => setModalOpen(true);
 
-  const handleCloseModal = (reason?: "backdropClick" | "escapeKeyDown") => {
+  const handleClosePaymentModal = (
+    reason?: "backdropClick" | "escapeKeyDown"
+  ) => {
+    console.log("!!Handle close");
     if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
       setModalOpen(false);
     }
   };
+  const handleCloseNavModalModal = () => {
+    console.log("!!Handle nav close");
+    setIsNavModalOpen(false);
+  };
+  // const handleCloseModal = () => createHandleCloseModal(setModalOpen);
 
   // Sends scrollHeight to SquareSpace to adjust IFrame height dynamically
   React.useEffect(() => {
@@ -38,13 +54,12 @@ const Hero: React.FC = () => {
     };
   }, []);
 
-  const { user, loading, userData, refetchUserData } = useAuth();
   const isUserSignedIn = !!user?.email;
   const isUserVerified = user?.emailVerified ?? false;
-  const userNeedsVerification = isUserSignedIn && !isUserVerified;
+  const isUserLoggedInAndNotVerified = isUserSignedIn && !isUserVerified;
 
   const handlePurchase = (type: "rent" | "buy") => {
-    handleCloseModal(); // Close modal after selection
+    handleClosePaymentModal(); // Close modal after selection
     // TODO: Implement Stripe checkout logic
   };
 
@@ -57,7 +72,7 @@ const Hero: React.FC = () => {
           placeItems: "center", // Centers content perfectly
           overflow: "hidden",
         }}>
-        {/* Background Vimeo Video (Fully Dynamic) */}
+        {/* VIMEO PLAYER */}
         <Box
           component='iframe'
           sx={{
@@ -73,7 +88,7 @@ const Hero: React.FC = () => {
           allowFullScreen
         />
 
-        {/* Overlay Content (Perfectly Centered Over Video) */}
+        {/* VIMEO TEXT/BUTTONS */}
         <Box
           sx={{
             gridArea: "1 / 1", // Ensures text and video overlap
@@ -129,14 +144,29 @@ const Hero: React.FC = () => {
       {/* Purchase Modal */}
       {modalOpen ? (
         <PurchaseModal
+          authState={authState}
           open={modalOpen}
-          handleClose={handleCloseModal}
+          handleClose={handleClosePaymentModal}
           handlePurchase={handlePurchase}
-          userNeedsVerification={userNeedsVerification}
-          isUserVerified={isUserVerified}
-          isUserSignedIn={isUserSignedIn}
+          // isUserLoggedInAndNotVerified={isUserLoggedInAndNotVerified}
+          // isUserVerified={isUserVerified}
+          // isUserSignedIn={isUserSignedIn}
           refetchUserData={refetchUserData}
           user={user}
+          loginErrors={loginErrors}
+          setLoginErrors={setLoginErrors}
+        />
+      ) : null}
+      {isNavModalOpen ? (
+        <RegisterOrLoginModal
+          authState={authState}
+          open={isNavModalOpen}
+          handleClose={handleCloseNavModalModal}
+          // isUserVerified={isUserVerified}
+          // isUserLoggedInAndNotVerified={isUserLoggedInAndNotVerified}
+          // isUserSignedIn={isUserSignedIn}
+          loginErrors={loginErrors}
+          setLoginErrors={setLoginErrors}
         />
       ) : null}
     </>
