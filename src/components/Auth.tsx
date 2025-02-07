@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { signUp, signIn, logOut } from "../utils/auth-utils";
 import { Button, TextField, Box, Typography } from "@mui/material";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../providers/useAuth";
 
 const Auth: React.FC = () => {
   const [email, setEmail] = useState("");
