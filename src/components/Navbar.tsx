@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
     <AppBar
       id='react-navbar'
       className='react-navbar'
-      position='absolute'
+      position='relative'
       sx={{
         background: "#000000",
         boxShadow: "none",
