@@ -16,6 +16,28 @@ const Hero: React.FC = () => {
     }
   };
 
+  // Sends scrollHeight to SquareSpace to adjust IFrame height dynamically
+  React.useEffect(() => {
+    const sendResizeMessage = () => {
+      // Get the height of the content inside the iframe (document body's height)
+      const height = document.body.scrollHeight;
+
+      // Send the resize message to the parent window (Squarespace)
+      window.parent.postMessage({ type: "resize", height: height }, "*");
+    };
+
+    // Send the message when the component mounts
+    sendResizeMessage();
+
+    // Optionally, trigger resize message on window resize
+    window.addEventListener("resize", sendResizeMessage);
+
+    // Cleanup event listener when component unmounts
+    return () => {
+      window.removeEventListener("resize", sendResizeMessage);
+    };
+  }, []);
+
   const { user, loading, userData, refetchUserData } = useAuth();
   const isUserSignedIn = !!user?.email;
   const isUserVerified = user?.emailVerified ?? false;
@@ -40,10 +62,9 @@ const Hero: React.FC = () => {
           component='iframe'
           sx={{
             width: "100%", // Fully responsive width
-            aspectRatio: "17.8 / 9", //Magic number that makes height of container exactly the height of video player.
-            // aspectRatio: "16 / 9", // Keeps proper video proportions
+            aspectRatio: "18 / 9", //Magic number that makes height of container exactly the height of video player('16 / 9' is default)
             objectFit: "cover", // Ensures no extra space appears
-            pointerEvents: "none", // Prevents interaction with the iframe
+            pointerEvents: "none",
             gridArea: "1 / 1", // Keeps video in the same grid as text
           }}
           src='https://player.vimeo.com/video/800568527?h=5f6f3af6b4&autoplay=1&loop=1&muted=1&background=1'
