@@ -34,3 +34,15 @@ export const signIn = async (
 export const logOut = async (): Promise<void> => {
   return await signOut(auth);
 };
+
+export enum UserAuthState {
+  NOT_SIGNED_IN = "NOT_SIGNED_IN",
+  SIGNED_IN_NOT_VERIFIED = "SIGNED_IN_NOT_VERIFIED",
+  VERIFIED = "VERIFIED",
+}
+
+export enum AuthStateDisabledMessage {
+  NOT_SIGNED_IN = "Please sign in to continue",
+  SIGNED_IN_NOT_VERIFIED = "Please verify your email to continue",
+  VERIFIED = "",
+}
