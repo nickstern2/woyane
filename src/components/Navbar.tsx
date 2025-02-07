@@ -118,10 +118,7 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
             ) : (
               <Button
                 variant='contained'
-                onClick={() => {
-                  console.log("!!open nav modal ");
-                  setIsNavModalOpen(true);
-                }}
+                onClick={() => setIsNavModalOpen(true)}
                 sx={{ mt: 2 }}>
                 {"Log In"}
               </Button>
