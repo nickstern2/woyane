@@ -24,8 +24,6 @@ interface PaymentFormProps {
   formikInitializerValues: FormikConfig<LoginFormInitialValuesType>;
   isAccordion?: boolean;
   expanded?: boolean;
-  displaySignedInConfirmation?: boolean;
-  UserIsSignedInConfirmationComponent?: React.JSX.Element;
   formId: string;
   onToggle?: () => void;
   authState: UserAuthState;
@@ -36,8 +34,6 @@ const RegisterOrLoginForm: React.FC<PaymentFormProps> = ({
   formikInitializerValues,
   isAccordion = false,
   expanded,
-  UserIsSignedInConfirmationComponent,
-  displaySignedInConfirmation,
   authState,
   onToggle,
 }) => {
@@ -54,7 +50,6 @@ const RegisterOrLoginForm: React.FC<PaymentFormProps> = ({
     []
   );
 
-  // TODO: Keep accordion collapsed and add success icon with message check email
   return (
     <ContainerWrapper
       isAccordion={isAccordion}
@@ -63,16 +58,12 @@ const RegisterOrLoginForm: React.FC<PaymentFormProps> = ({
       isLogin={isLogin}
       toggleAuthMode={toggleAuthMode}
       authState={authState}>
-      {displaySignedInConfirmation ? (
-        UserIsSignedInConfirmationComponent
-      ) : (
-        <RegisterOrLoginFields
-          formik={formik}
-          formId={formId}
-          isLogin={isLogin}
-          isAccordion={isAccordion}
-        />
-      )}
+      <RegisterOrLoginFields
+        formik={formik}
+        formId={formId}
+        isLogin={isLogin}
+        isAccordion={isAccordion}
+      />
     </ContainerWrapper>
   );
 };
