@@ -5,6 +5,6 @@ import * as Yup from "yup";
 export const PurchaseModalValidationSchema = Yup.object({
   email: Yup.string().email().required("Email is required"),
   password: Yup.string()
-    .required("No password provided.")
-    .min(8, "Password is too short - should be 8 chars minimum."),
+    .required("Password is required")
+    .min(8, "Password is too short - 8 chars minimum"),
 });

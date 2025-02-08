@@ -99,11 +99,6 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   handleClose,
   handlePurchase,
 }) => {
-  // const { user: userDataTest, emailVerified: emailVerifiedTest } =
-  // useUserStatus();
-
-  // TODO: rename prob to this maybe
-
   const [emailVerified, setEmailVerified] = useState(false);
   const [isSignUpSectionExpanded, setIsSignUpSectionExpanded] = useState(true);
   const [isPaymentSectionExpanded, setIsPaymentSectionExpanded] = useState(
@@ -199,7 +194,6 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const paymentInfoFormik = useFormik({
     initialValues: BillingInitialValues,
     // validationSchema: PurchaseModalValidationSchema,
-    // TODO: Isolate logic to reuse on both forms
     onSubmit: async (values, { setSubmitting }) => {
       console.log("!!Submit", values);
     },
@@ -226,7 +220,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       handleClose={handleClose}
       customOnSubmit={() => paymentInfoFormik.submitForm()}
       tooltipDisabledMessage={tooltipDisabledMessage}
-      authState={authState}>
+      authState={authState}
+      confirmationSuccessTitle='Purchase' //TODO: switch with rent. Or you better action word
+    >
       <>
         <RegisterOrLoginForm
           formId='woyane-ud'
@@ -235,19 +231,6 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
           formikInitializerValues={loginFormUseFormikValues}
           expanded={isSignUpSectionExpanded}
           onToggle={() => handleAccordionToggle(setIsSignUpSectionExpanded)}
-          displaySignedInConfirmation={
-            authState === UserAuthState.SIGNED_IN_NOT_VERIFIED
-          } //TODO: determine
-          UserIsSignedInConfirmationComponent={
-            <AccordionDetails style={AccordionDetailsStyles}>
-              <div>
-                Please accept email verification
-                <br />
-                If you are seeing this and already have accepted email
-                verification, please refresh your browser
-              </div>
-            </AccordionDetails>
-          } //TODO: Design this for when authState === UserAuthState.SIGNED_IN_NOT_VERIFIED
         />
 
         <form id='woyane-bd' onSubmit={paymentInfoFormik.handleSubmit}>

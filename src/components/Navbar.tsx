@@ -9,20 +9,13 @@ import {
   Avatar,
   Box,
   Button,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
-import { useAuth } from "../providers/useAuth";
+import { useAuth, UserAuthState } from "../providers/useAuth";
 import { logOut } from "../utils/auth-utils";
-import { RegisterOrLoginModal } from "./RegisterOrLoginModal";
 
-// const navItems = ["Home", "About", "Services", "Contact"];
 const navItems = [
   { label: "Home", id: "home-section" },
   { label: "About", id: "about-section" },
@@ -35,7 +28,8 @@ const handleScroll = (id: string) => {
   if (section) {
     console.log("!!Scroll");
     section.scrollIntoView({ behavior: "smooth" });
-    window.history.pushState(null, "", `#${id}`); // Optional: Update URL
+    // TODO: Try this maybe
+    // window.history.pushState(null, "", `#${id}`); // Optional: Update URL
   }
 };
 
@@ -44,15 +38,8 @@ type NavBarProps = {
 };
 
 const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
-  const { user } = useAuth();
-  // const { user, loading, userData, refetchUserData } = useAuth();
+  const { user, authState } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  // const [modalOpen, setModalOpen] = useState(false);
-
-  // const handleCloseModal = () => {
-  //   console.log("!!Handle close modal");
-  //   setIsNavModalOpen(false);
-  // };
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -62,16 +49,9 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
   const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = () => {
     logOut();
-    // Close toggle
     handleMenuClose();
   };
 
-  // const toggleDrawer = () => setModalOpen((prev) => !prev);
-
-  console.log("!user", user);
-  const isUserSignedIn = !!user?.email;
-  const isUserVerified = user?.emailVerified ?? false;
-  const userNeedsVerification = isUserSignedIn && !isUserVerified;
   return (
     <>
       <AppBar
@@ -108,9 +88,9 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
             </Box>
           )}
 
-          {/* //TODO: think top half is broken  */}
           {!isMobile &&
-            (isUserSignedIn ? (
+            // If user is signed in
+            (authState !== UserAuthState.NOT_SIGNED_IN ? (
               <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                 {/* <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}> */}
                 <Avatar alt='Profile' src='/profile.jpg' />
@@ -141,19 +121,6 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
             </IconButton>
           )}
         </Toolbar>
-
-        {/* Mobile Drawer */}
-        {/* <Drawer anchor='left' open={mobileOpen} onClose={handleMenuOpen}>
-          <List sx={{ width: 250 }}>
-            {navItems.map((item) => (
-            <ListItem key={item} disablePadding>
-              <ListItemButton onClick={toggleDrawer}>
-                <ListItemText primary={item} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          </List>
-        </Drawer> */}
       </AppBar>
     </>
   );

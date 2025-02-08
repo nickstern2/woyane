@@ -42,7 +42,8 @@ export const RegisterOrLoginModal: FC<RegisterOrLoginModalProps> = ({
       maxWidth='sm'
       hideConfirmationDialog
       hideActionButtons
-      handleClose={handleClose}>
+      handleClose={handleClose}
+      authState={authState}>
       <RegisterOrLoginForm
         authState={authState}
         formId='navbar-ud'

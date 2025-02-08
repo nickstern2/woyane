@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,24 +6,8 @@ import {
   DialogActions,
   Button,
   Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Stack,
-  TextField,
 } from "@mui/material";
-import { useFormik } from "formik";
-import { getAuth, sendEmailVerification, User } from "firebase/auth";
-import { PurchaseModalValidationSchema } from "../utils/validations";
-import { signIn, signUp } from "../utils/auth-utils";
 
-// Reusable confirmation dialog
-// TODO: Maybe make the same size as purchase modal
-/**
- * TODO: add props here to determine text.
- * a) user is signed up but not verified, say "are you sure cancel purchase.. account is still there if you change your mind"
- * etc...
- */
 export const ConfirmationDialog: React.FC<{
   open: boolean;
   onClose: () => void;
