@@ -8,7 +8,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { FormikConfig, FormikValues, useFormik } from "formik";
+import { FormikConfig, FormikProps, FormikValues, useFormik } from "formik";
 import { AccordionStyles, linkStyles, summaryStyles } from "../../utils/styles";
 import { LoginFormInitialValuesType } from "../../utils/types";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -50,7 +50,7 @@ const RegisterOrLoginForm: React.FC<PaymentFormProps> = ({
     []
   );
 
-  return (
+  return authState === UserAuthState.VERIFIED ? null : (
     <ContainerWrapper
       isAccordion={isAccordion}
       expanded={authState !== UserAuthState.NOT_SIGNED_IN ? false : expanded}
