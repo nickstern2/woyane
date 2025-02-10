@@ -255,10 +255,8 @@ const CheckoutFields: React.FC<{
       spacing={2}
       sx={{
         mx: "auto",
-        py: 2,
+        paddingBottom: 2,
       }}>
-      <Typography variant='h5'>Payment Details</Typography>
-
       <Stack direction='row' gap={2}>
         <TextField
           name='firstName'
