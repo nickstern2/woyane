@@ -4,7 +4,7 @@
     // "target": "es5",
     "module": "ESNext", // switched to import.meta.env
     // "module": "commonjs",
-    "forceConsistentCasingInFileNames": true,
+    // "forceConsistentCasingInFileNames": true,//Added to make env import work but dont think its needed
     "outDir": "./dist", // or another directory
     "lib": ["dom", "es2015"],
     "allowJs": false,
