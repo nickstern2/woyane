@@ -4,6 +4,10 @@ export type Config = {
 };
 
 const loadConfig = (): Config => {
+  console.log(
+    "!isProduction?",
+    import.meta.env.MODE === "production" ? "Production" : "Dev"
+  );
   return {
     FirebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? "",
     StripePK:
