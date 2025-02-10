@@ -184,7 +184,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   const StripCheckoutFormik = useFormik({
     initialValues: CheckoutFormInitialValues,
-    validationSchema: validationSchema,
+    // validationSchema: validationSchema,
     onSubmit: handleSubmit,
   });
 
