@@ -163,6 +163,9 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
             gridTemplateColumns: "1fr auto", // Text takes most space, mute button stays small
             alignItems: "center",
             padding: 4,
+            // Gradient to see text better. Change first rgba 'a' value to darken/lighten(0.6 right now)
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,0.6) 15%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0) 100%)",
           }}>
           {/* Box 2: Text & Buttons (Aligned Left) */}
           <Box
