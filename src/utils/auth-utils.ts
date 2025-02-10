@@ -46,3 +46,40 @@ export enum AuthStateDisabledMessage {
   SIGNED_IN_NOT_VERIFIED = "Please verify your email to continue",
   VERIFIED = "",
 }
+
+export const getTooltipMessage = (authState: UserAuthState) => {
+  let message = "";
+  switch (authState) {
+    case UserAuthState.NOT_SIGNED_IN:
+      message = AuthStateDisabledMessage.NOT_SIGNED_IN;
+      break;
+
+    case UserAuthState.SIGNED_IN_NOT_VERIFIED:
+      message = AuthStateDisabledMessage.SIGNED_IN_NOT_VERIFIED;
+      break;
+
+    default:
+      message = "";
+      break;
+  }
+  return message;
+};
+export const getIsBillingSectionExpanded = (authState: UserAuthState) => {
+  let isExpanded = false;
+
+  switch (authState) {
+    case UserAuthState.NOT_SIGNED_IN:
+      isExpanded = false;
+      break;
+    case UserAuthState.SIGNED_IN_NOT_VERIFIED:
+      isExpanded = false;
+      break;
+    case UserAuthState.VERIFIED:
+      isExpanded = true;
+      break;
+    default:
+      isExpanded = false;
+      break;
+  }
+  return isExpanded;
+};
