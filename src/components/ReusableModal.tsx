@@ -44,8 +44,6 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
   handleClose,
   customOnSubmit,
 }) => {
-  // const [loginError, setLoginError] = useState(false);
-  console.log("!!loginErrors", loginErrors);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleCloseConfirmationDialog = () => {
@@ -98,7 +96,11 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
               )}
 
               <Button
-                onClick={() => setShowConfirmDialog(true)}
+                onClick={() =>
+                  authState !== UserAuthState.SIGNED_IN_NOT_VERIFIED
+                    ? setShowConfirmDialog(true)
+                    : handleClose()
+                }
                 color='inherit'>
                 Cancel
               </Button>
