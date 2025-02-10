@@ -16,7 +16,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { sendEmailVerification } from "firebase/auth";
-import { signIn, signUp, UserAuthState } from "../../utils/auth-utils";
+import {
+  PurchaseType,
+  signIn,
+  signUp,
+  UserAuthState,
+} from "../../utils/auth-utils";
 import LockIcon from "@mui/icons-material/Lock";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
@@ -89,6 +94,7 @@ const ContainerWrapper: React.FC<{
   authState,
   children,
 }) => {
+  // TODO: These are the same just render <AuthToggle isLogin={isLogin} toggleAuthMode={toggleAuthMode} />
   const headerContent = !isAccordion ? (
     <AuthToggle isLogin={isLogin} toggleAuthMode={toggleAuthMode} />
   ) : expanded ? (

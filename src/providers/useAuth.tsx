@@ -8,13 +8,7 @@ import React, {
 import { getIdToken, onIdTokenChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
-
-// Define Enum for User Authentication State
-export enum UserAuthState {
-  NOT_SIGNED_IN = "NOT_SIGNED_IN",
-  SIGNED_IN_NOT_VERIFIED = "SIGNED_IN_NOT_VERIFIED",
-  VERIFIED = "VERIFIED",
-}
+import { UserAuthState } from "../utils/auth-utils";
 
 // Define Context Interface
 interface AuthContextType {

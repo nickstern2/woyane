@@ -47,6 +47,11 @@ export enum AuthStateDisabledMessage {
   VERIFIED = "",
 }
 
+export enum PurchaseType {
+  PURCHASE = "PURCHASE",
+  RENT = "RENT",
+}
+
 export const getTooltipMessage = (authState: UserAuthState) => {
   let message = "";
   switch (authState) {

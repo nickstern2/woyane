@@ -4,6 +4,7 @@ import { PurchaseModalValidationSchema } from "../utils/validations";
 import {
   getIsBillingSectionExpanded,
   getTooltipMessage,
+  PurchaseType,
   UserAuthState,
 } from "../utils/auth-utils";
 import { User } from "firebase/auth";
@@ -24,6 +25,7 @@ interface PurchaseModalProps {
   refetchUserData: (user: User) => Promise<void>;
   setLoginErrors: React.Dispatch<React.SetStateAction<boolean>>;
   authState: UserAuthState;
+  purchaseType: PurchaseType | null;
 }
 
 const handleAccordionToggle = (
@@ -36,6 +38,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   open,
   authState,
   user,
+  purchaseType,
   loginErrors,
   setLoginErrors,
   refetchUserData,
@@ -46,9 +49,12 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const [emailVerified, setEmailVerified] = useState(false);
   const [isSignUpSectionExpanded, setIsSignUpSectionExpanded] = useState(true);
   const isBillingSectionExpanded = getIsBillingSectionExpanded(authState);
+
   console.log("!!isBillingSectionExpanded", isBillingSectionExpanded);
 
   const tooltipDisabledMessage = getTooltipMessage(authState);
+  const purchaseActionText =
+    purchaseType === PurchaseType.PURCHASE ? "Purchase" : "Rent";
 
   console.log("!clientSecret", clientSecret);
 
@@ -64,7 +70,6 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         values,
         formikHelpers,
         setLoginErrors
-        // handleClose
       );
     },
   };
@@ -76,14 +81,13 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   return (
     <ReusableModal
       loginErrors={loginErrors}
-      title='Purchase or Rent Woyane'
+      title={`${purchaseActionText} Woyane`}
       open={open}
       handleClose={handleClose}
       // customOnSubmit={() => }//todo: stripe onsubmit
       tooltipDisabledMessage={tooltipDisabledMessage}
       authState={authState}
-      confirmationSuccessTitle='Purchase' //TODO: switch with rent. Or you better action word
-    >
+      confirmationSuccessTitle={purchaseActionText}>
       <>
         <RegisterOrLoginForm
           formId='woyane-ud'
