@@ -11,7 +11,7 @@
     "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    // "noEmit": false,
+    "noEmit": false,
     "skipLibCheck": true,
     "strict": true, // Enable strict type checking
     "noUnusedLocals": false, // Disable errors for unused variables
