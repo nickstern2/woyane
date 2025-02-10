@@ -6,7 +6,6 @@ import {
   Typography,
   Menu,
   MenuItem,
-  Avatar,
   Box,
   Button,
   useMediaQuery,
@@ -15,22 +14,20 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../providers/useAuth";
 import { logOut, UserAuthState } from "../utils/auth-utils";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
+// Set the section id in SS to to match these ids
 const navItems = [
   { label: "Home", id: "home-section" },
   { label: "About", id: "about-section" },
-  { label: "Services", id: "services-section" },
+  // { label: "Services", id: "services-section" },//TODO: No services info on the site yet
+  { label: "Team", id: "team-section" },
   { label: "Contact", id: "contact-section" },
 ];
 
 const handleScroll = (id: string) => {
-  const section = document.getElementById(id);
-  if (section) {
-    console.log("!!Scroll");
-    section.scrollIntoView({ behavior: "smooth" });
-    // TODO: Try this maybe
-    // window.history.pushState(null, "", `#${id}`); // Optional: Update URL
-  }
+  // Sends scroll ID to front-end
+  window.parent.postMessage({ type: "scrollToSection", sectionId: id }, "*");
 };
 
 type NavBarProps = {
@@ -38,7 +35,7 @@ type NavBarProps = {
 };
 
 const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
-  const { user, authState } = useAuth();
+  const { authState } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const theme = useTheme();
@@ -68,7 +65,7 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
             justifyContent: "space-between",
             alignItems: "center",
           }}>
-          {/* Logo or Brand */}
+          {/* //TODO: Logo or Font to match SS */}
           <Typography variant='h6' component='div' sx={{ fontWeight: "bold" }}>
             Woyane
           </Typography>
@@ -91,15 +88,24 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
           {!isMobile &&
             // If user is signed in
             (authState !== UserAuthState.NOT_SIGNED_IN ? (
-              <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
-                {/* <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}> */}
-                <Avatar alt='Profile' src='/profile.jpg' />
+              <IconButton
+                onClick={handleMenuOpen}
+                sx={{ color: "white", p: 0 }}>
+                <AccountCircleIcon fontSize='large' />
               </IconButton>
             ) : (
               <Button
-                variant='contained'
-                onClick={() => setIsNavModalOpen(true)}
-                sx={{ mt: 2 }}>
+                sx={{
+                  backgroundColor: "transparent", // Removes solid background
+                  color: "white", // Matches navbar text color
+                  border: "2px solid white", // Adds an outline for visibility
+                  padding: "6px 12px", // Adjust padding to match navbar size
+                  borderRadius: "4px",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)", // Slight hover effect
+                  },
+                }}
+                onClick={() => setIsNavModalOpen(true)}>
                 {"Log In"}
               </Button>
             ))}
