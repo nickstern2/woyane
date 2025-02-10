@@ -44,8 +44,6 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
   handleClose,
   customOnSubmit,
 }) => {
-  // const [loginError, setLoginError] = useState(false);
-  console.log("!!loginErrors", loginErrors);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleCloseConfirmationDialog = () => {
@@ -61,7 +59,9 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
         fullWidth
         onClose={(_, reason) => handleClose(reason)}>
         {/* Title */}
-        {title ? <DialogTitle>{title}</DialogTitle> : null}
+        {title ? (
+          <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
+        ) : null}
         {/* Body */}
         <DialogContent>{children}</DialogContent>
         <ErrorMessageComponent showError={loginErrors} />
@@ -79,7 +79,8 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
                         customOnSubmit ? customOnSubmit : () => undefined
                       }
                       variant='contained'
-                      color='primary'>
+                      color='primary'
+                      startIcon={<LockIcon />}>
                       {confirmationSuccessTitle ?? "Confirm"}
                     </Button>
                   </span>
@@ -89,14 +90,17 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
                   type='submit'
                   onClick={customOnSubmit ? customOnSubmit : () => undefined}
                   variant='contained'
-                  color='primary'
-                  startIcon={<LockIcon />}>
+                  color='primary'>
                   {confirmationSuccessTitle ?? "Confirm"}
                 </Button>
               )}
 
               <Button
-                onClick={() => setShowConfirmDialog(true)}
+                onClick={() =>
+                  authState !== UserAuthState.SIGNED_IN_NOT_VERIFIED
+                    ? setShowConfirmDialog(true)
+                    : handleClose()
+                }
                 color='inherit'>
                 Cancel
               </Button>
