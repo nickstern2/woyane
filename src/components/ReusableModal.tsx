@@ -61,7 +61,9 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
         fullWidth
         onClose={(_, reason) => handleClose(reason)}>
         {/* Title */}
-        {title ? <DialogTitle>{title}</DialogTitle> : null}
+        {title ? (
+          <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
+        ) : null}
         {/* Body */}
         <DialogContent>{children}</DialogContent>
         <ErrorMessageComponent showError={loginErrors} />
@@ -79,7 +81,8 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
                         customOnSubmit ? customOnSubmit : () => undefined
                       }
                       variant='contained'
-                      color='primary'>
+                      color='primary'
+                      startIcon={<LockIcon />}>
                       {confirmationSuccessTitle ?? "Confirm"}
                     </Button>
                   </span>
@@ -89,8 +92,7 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
                   type='submit'
                   onClick={customOnSubmit ? customOnSubmit : () => undefined}
                   variant='contained'
-                  color='primary'
-                  startIcon={<LockIcon />}>
+                  color='primary'>
                   {confirmationSuccessTitle ?? "Confirm"}
                 </Button>
               )}
