@@ -19,11 +19,10 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
   const { user, authState, refetchUserData } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [loginErrors, setLoginErrors] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const [purchaseType, setPurchaseType] = useState<PurchaseType | null>(null);
 
   const vimeoPlayerRef = React.useRef<Player | null>(null);
-
+  const [isMuted, setIsMuted] = useState(true);
   // Ensures video is muted at initial load
   React.useEffect(() => {
     const iframe = document.getElementById("vimeo-player") as HTMLIFrameElement;
@@ -43,6 +42,18 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
       const newMutedState = !isMuted;
       await vimeoPlayerRef.current.setMuted(newMutedState);
       setIsMuted(newMutedState);
+      console.log("!isMuted", isMuted, newMutedState === false);
+      // Some browsers natively pause video playback to protect users
+      // This ensures when video is "unmuted" the video playback continues
+      if (newMutedState === false) {
+        try {
+          console.log("!!Force video play");
+          await vimeoPlayerRef.current.play();
+        } catch (error) {
+          console.log("!!error - Force video play");
+          console.error("Playback was blocked:", error);
+        }
+      }
     }
   };
 
