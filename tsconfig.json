@@ -4,14 +4,14 @@
     // "target": "es5",
     "module": "ESNext", // switched to import.meta.env
     // "module": "commonjs",
-    "forceConsistentCasingInFileNames": true,
+    // "forceConsistentCasingInFileNames": true,//Added to make env import work but dont think its needed
     "outDir": "./dist", // or another directory
     "lib": ["dom", "es2015"],
     "allowJs": false,
     "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    // "noEmit": false,
+    "noEmit": false,
     "skipLibCheck": true,
     "strict": true, // Enable strict type checking
     "noUnusedLocals": false, // Disable errors for unused variables

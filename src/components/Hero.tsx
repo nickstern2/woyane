@@ -19,11 +19,11 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
   const { user, authState, refetchUserData } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [loginErrors, setLoginErrors] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  // const [userInteracted, setUserInteracted] = useState(false);
   const [purchaseType, setPurchaseType] = useState<PurchaseType | null>(null);
 
   const vimeoPlayerRef = React.useRef<Player | null>(null);
-
+  const [isMuted, setIsMuted] = useState(true);
   // Ensures video is muted at initial load
   React.useEffect(() => {
     const iframe = document.getElementById("vimeo-player") as HTMLIFrameElement;
@@ -43,6 +43,24 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
       const newMutedState = !isMuted;
       await vimeoPlayerRef.current.setMuted(newMutedState);
       setIsMuted(newMutedState);
+      // Some browsers natively pause video playback to protect users
+      // This ensures when video is "unmuted" the video playback continues
+      if (newMutedState === false) {
+        try {
+          const playPromise = vimeoPlayerRef.current.play();
+
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.warn(
+                "Playback blocked, user interaction required:",
+                error
+              );
+            });
+          }
+        } catch (error) {
+          console.error("!!Playback was blocked:", error);
+        }
+      }
     }
   };
 
@@ -90,6 +108,25 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
     // TODO: Implement Stripe checkout logic
   };
 
+  // React.useEffect(() => {
+  //   const handleUserInteraction = () => {
+  //     console.log(
+  //       "✅ User interaction detected, sending message to Squarespace."
+  //     );
+
+  //     // Send user interaction event to Squarespace
+  //     window.parent.postMessage({ type: "userInteraction" }, "*");
+
+  //     // Store interaction in localStorage
+  //     window.localStorage.setItem("user_interacted", "true");
+  //     setUserInteracted(true);
+
+  //     document.removeEventListener("click", handleUserInteraction);
+  //   };
+
+  //   document.addEventListener("click", handleUserInteraction);
+  //   return () => document.removeEventListener("click", handleUserInteraction);
+  // }, []);
   return (
     <>
       <Box
@@ -100,6 +137,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
           overflow: "hidden",
         }}>
         {/* Background Video */}
+
         <Box
           id='vimeo-player'
           component='iframe'
@@ -110,7 +148,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
             pointerEvents: "none",
             gridArea: "1 / 1", // Keeps video as the background
           }}
-          src='https://player.vimeo.com/video/800568527?h=5f6f3af6b4&autoplay=1&loop=1&background=1'
+          src='https://player.vimeo.com/video/800568527?h=5f6f3af6b4&autoplay=1&muted=1&loop=1&background=1'
           frameBorder='0'
           allow='autoplay; fullscreen'
           allowFullScreen
