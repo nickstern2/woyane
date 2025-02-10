@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
-import { useAuth, UserAuthState } from "../providers/useAuth";
-import { logOut } from "../utils/auth-utils";
+import { useAuth } from "../providers/useAuth";
+import { logOut, UserAuthState } from "../utils/auth-utils";
 
 const navItems = [
   { label: "Home", id: "home-section" },
