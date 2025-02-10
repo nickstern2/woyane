@@ -4,16 +4,9 @@ export type Config = {
 };
 
 const loadConfig = (): Config => {
-  console.log(
-    "!isProduction?",
-    import.meta.env.MODE === "production" ? "Production" : "Dev"
-  );
   return {
     FirebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? "",
-    StripePK:
-      import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_STRIPE_LIVE_PK ?? ""
-        : import.meta.env.VITE_STRIPE_TEST_PK ?? "",
+    StripePK: import.meta.env.VITE_STRIPE_TEST_PK ?? "",
   };
 };
 
