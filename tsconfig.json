@@ -1,7 +1,22 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ESNext", // switched to import.meta.env
+    // "target": "es5",
+    "module": "ESNext", // switched to import.meta.env
+    // "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist", // or another directory
+    "lib": ["dom", "es2015"],
+    "allowJs": false,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    // "noEmit": false,
+    "skipLibCheck": true,
+    "strict": true, // Enable strict type checking
+    "noUnusedLocals": false, // Disable errors for unused variables
+    "noUnusedParameters": false
+  },
+  "include": ["src/**/*"],
+  "composite": true
 }
