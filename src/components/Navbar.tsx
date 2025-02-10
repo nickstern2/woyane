@@ -97,9 +97,17 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
               </IconButton>
             ) : (
               <Button
-                variant='contained'
-                onClick={() => setIsNavModalOpen(true)}
-                sx={{ mt: 2 }}>
+                sx={{
+                  backgroundColor: "transparent", // Removes solid background
+                  color: "white", // Matches navbar text color
+                  border: "2px solid white", // Optional: Adds an outline for visibility
+                  padding: "6px 12px", // Adjust padding to match navbar size
+                  borderRadius: "4px", // Slight rounding for a clean look
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)", // Slight hover effect
+                  },
+                }}
+                onClick={() => setIsNavModalOpen(true)}>
                 {"Log In"}
               </Button>
             ))}
