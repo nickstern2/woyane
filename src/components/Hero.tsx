@@ -19,7 +19,6 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
   const { user, authState, refetchUserData } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [loginErrors, setLoginErrors] = useState(false);
-  // const [userInteracted, setUserInteracted] = useState(false);
   const [purchaseType, setPurchaseType] = useState<PurchaseType | null>(null);
 
   const vimeoPlayerRef = React.useRef<Player | null>(null);
