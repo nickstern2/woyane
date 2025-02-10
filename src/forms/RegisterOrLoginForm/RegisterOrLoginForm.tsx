@@ -149,7 +149,7 @@ const SubmissionStatus: React.FC<{ authState: UserAuthState }> = ({
 };
 
 const RegisterOrLoginFields: React.FC<{
-  formik: FormikValues;
+  formik: FormikProps<LoginFormInitialValuesType>;
   formId: string;
   isLogin: boolean;
   isAccordion: boolean;
