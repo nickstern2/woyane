@@ -8,7 +8,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { FormikConfig, FormikValues, useFormik } from "formik";
+import { FormikConfig, FormikProps, FormikValues, useFormik } from "formik";
 import { AccordionStyles, linkStyles, summaryStyles } from "../../utils/styles";
 import { LoginFormInitialValuesType } from "../../utils/types";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -16,7 +16,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { sendEmailVerification } from "firebase/auth";
-import { signIn, signUp, UserAuthState } from "../../utils/auth-utils";
+import {
+  PurchaseType,
+  signIn,
+  signUp,
+  UserAuthState,
+} from "../../utils/auth-utils";
 import LockIcon from "@mui/icons-material/Lock";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
@@ -50,7 +55,7 @@ const RegisterOrLoginForm: React.FC<PaymentFormProps> = ({
     []
   );
 
-  return (
+  return authState === UserAuthState.VERIFIED ? null : (
     <ContainerWrapper
       isAccordion={isAccordion}
       expanded={authState !== UserAuthState.NOT_SIGNED_IN ? false : expanded}
@@ -89,6 +94,7 @@ const ContainerWrapper: React.FC<{
   authState,
   children,
 }) => {
+  // TODO: These are the same just render <AuthToggle isLogin={isLogin} toggleAuthMode={toggleAuthMode} />
   const headerContent = !isAccordion ? (
     <AuthToggle isLogin={isLogin} toggleAuthMode={toggleAuthMode} />
   ) : expanded ? (
@@ -149,7 +155,7 @@ const SubmissionStatus: React.FC<{ authState: UserAuthState }> = ({
 };
 
 const RegisterOrLoginFields: React.FC<{
-  formik: FormikValues;
+  formik: FormikProps<LoginFormInitialValuesType>;
   formId: string;
   isLogin: boolean;
   isAccordion: boolean;

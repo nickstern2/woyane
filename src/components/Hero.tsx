@@ -8,6 +8,7 @@ import { RegisterOrLoginModal } from "./RegisterOrLoginModal";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import Player from "@vimeo/player";
+import { PurchaseType } from "../utils/auth-utils";
 
 type HeroProps = {
   isNavModalOpen: boolean;
@@ -19,6 +20,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [loginErrors, setLoginErrors] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [purchaseType, setPurchaseType] = useState<PurchaseType | null>(null);
 
   const vimeoPlayerRef = React.useRef<Player | null>(null);
 
@@ -44,13 +46,17 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
     }
   };
 
-  const handleOpenModal = () => setModalOpen(true);
+  const handleOpenPurchaseModal = (purchaseType: PurchaseType) => {
+    setPurchaseType(purchaseType);
+    setModalOpen(true);
+  };
 
   const handleClosePaymentModal = (
     reason?: "backdropClick" | "escapeKeyDown"
   ) => {
     if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
       setModalOpen(false);
+      setPurchaseType(purchaseType);
     }
   };
   const handleCloseNavModalModal = () => {
@@ -148,6 +154,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
             {/* Buttons */}
             <Box sx={{ display: "flex", gap: 2 }}>
               <Button
+                onClick={() => handleOpenPurchaseModal(PurchaseType.RENT)}
                 variant='contained'
                 sx={{
                   bgcolor: "rgba(255, 255, 255, 0.1)",
@@ -157,7 +164,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
                 ▶ Rent
               </Button>
               <Button
-                onClick={handleOpenModal}
+                onClick={() => handleOpenPurchaseModal(PurchaseType.PURCHASE)}
                 variant='contained'
                 sx={{
                   bgcolor: "rgba(255, 255, 255, 0.1)",
@@ -193,6 +200,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
           user={user}
           loginErrors={loginErrors}
           setLoginErrors={setLoginErrors}
+          purchaseType={purchaseType}
         />
       ) : null}
       {isNavModalOpen ? (

@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
+    "target": "ESNext", // switched to import.meta.env
+    // "target": "es5",
+    "module": "ESNext", // switched to import.meta.env
+    // "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
     "outDir": "./dist", // or another directory
-    "target": "es5",
     "lib": ["dom", "es2015"],
     "allowJs": false,
     "jsx": "react",
-    "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     // "noEmit": false,
