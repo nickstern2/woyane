@@ -116,7 +116,8 @@ const Navbar: React.FC<NavBarProps> = ({ setIsNavModalOpen }) => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
             sx={{ mt: 1 }}>
-            <MenuItem onClick={handleMenuClose}>Purchase History</MenuItem>
+            {/* //TODO: Add Payment History Modal later */}
+            {/* <MenuItem onClick={handleMenuClose}>Purchase History</MenuItem> */}
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
 

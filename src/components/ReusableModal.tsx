@@ -28,6 +28,7 @@ interface ReusableModalProps {
   loginErrors: boolean;
   tooltipDisabledMessage?: string;
   authState: UserAuthState;
+  isAccordion: boolean;
 }
 
 const ReusableModal: React.FC<ReusableModalProps> = ({
@@ -41,6 +42,7 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
   loginErrors,
   authState,
   tooltipDisabledMessage,
+  isAccordion,
   handleClose,
   customOnSubmit,
 }) => {
@@ -64,7 +66,10 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
         ) : null}
         {/* Body */}
         <DialogContent>{children}</DialogContent>
-        <ErrorMessageComponent showError={loginErrors} />
+        <ErrorMessageComponent
+          isAccordion={isAccordion}
+          showError={loginErrors}
+        />
         {/* Action Buttons */}
         {hideActionButtons ? null : (
           <DialogActions>

@@ -74,10 +74,12 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
     if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
       setModalOpen(false);
       setPurchaseType(purchaseType);
+      setLoginErrors(false);
     }
   };
   const handleCloseNavModalModal = () => {
     setIsNavModalOpen(false);
+    setLoginErrors(false);
   };
 
   // Sends scrollHeight to SquareSpace to adjust IFrame height dynamically
@@ -232,6 +234,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
       </Box>
       {modalOpen ? (
         <PurchaseModal
+          isAccordion={true}
           authState={authState}
           open={modalOpen}
           handleClose={handleClosePaymentModal}
@@ -245,6 +248,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
       ) : null}
       {isNavModalOpen ? (
         <RegisterOrLoginModal
+          isAccordion={false}
           authState={authState}
           open={isNavModalOpen}
           handleClose={handleCloseNavModalModal}

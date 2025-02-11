@@ -26,6 +26,7 @@ interface PurchaseModalProps {
   setLoginErrors: React.Dispatch<React.SetStateAction<boolean>>;
   authState: UserAuthState;
   purchaseType: PurchaseType | null;
+  isAccordion: boolean;
 }
 
 const handleAccordionToggle = (
@@ -37,6 +38,7 @@ const handleAccordionToggle = (
 const PurchaseModal: React.FC<PurchaseModalProps> = ({
   open,
   authState,
+  isAccordion,
   user,
   purchaseType,
   loginErrors,
@@ -80,6 +82,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
   return (
     <ReusableModal
+      isAccordion={isAccordion}
       loginErrors={loginErrors}
       title={`${purchaseActionText} Woyane`}
       open={open}

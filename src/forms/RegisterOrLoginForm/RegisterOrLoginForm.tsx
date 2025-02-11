@@ -171,6 +171,7 @@ const RegisterOrLoginFields: React.FC<{
         required
         name='email'
         label='Email'
+        size='small'
         fullWidth
         value={formik.values.email}
         onChange={formik.handleChange}
@@ -183,6 +184,7 @@ const RegisterOrLoginFields: React.FC<{
         name='password'
         type='password'
         label='Password'
+        size='small'
         fullWidth
         value={formik.values.password}
         onChange={formik.handleChange}
@@ -190,7 +192,11 @@ const RegisterOrLoginFields: React.FC<{
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
-      <Button type='submit' variant='contained' sx={{ mt: 2 }}>
+      <Button
+        disabled={formik.isSubmitting}
+        type='submit'
+        variant='contained'
+        sx={{ mt: 2 }}>
         {isLogin ? "Sign In" : "Sign Up"}
       </Button>
     </Stack>
