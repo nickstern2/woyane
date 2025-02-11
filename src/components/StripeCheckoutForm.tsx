@@ -224,7 +224,7 @@ const ContainerWrapper: React.FC<{
             </IconButton>
           </span>
         </Tooltip>
-        <Typography textAlign='center'>
+        <Typography alignSelf='center'>
           You must {action} to continue
         </Typography>
       </>
