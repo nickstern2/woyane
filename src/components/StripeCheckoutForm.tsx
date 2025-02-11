@@ -257,6 +257,7 @@ const CheckoutFields: React.FC<{
         <TextField
           name='firstName'
           label='First Name'
+          size='small'
           fullWidth
           value={formik.values.firstName}
           onChange={formik.handleChange}
@@ -267,6 +268,7 @@ const CheckoutFields: React.FC<{
         <TextField
           name='lastName'
           label='Last Name'
+          size='small'
           fullWidth
           value={formik.values.lastName}
           onChange={formik.handleChange}
@@ -292,6 +294,7 @@ const CheckoutFields: React.FC<{
         <TextField
           name='city'
           label='City'
+          size='small'
           fullWidth
           value={formik.values.city}
           onChange={formik.handleChange}
@@ -302,6 +305,7 @@ const CheckoutFields: React.FC<{
         <TextField
           name='state'
           label='State'
+          size='small'
           fullWidth
           value={formik.values.state}
           onChange={formik.handleChange}
@@ -312,6 +316,7 @@ const CheckoutFields: React.FC<{
         <TextField
           name='zipCode'
           label='ZIP Code'
+          size='small'
           fullWidth
           value={formik.values.zipCode}
           onChange={formik.handleChange}

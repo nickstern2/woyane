@@ -171,6 +171,7 @@ const RegisterOrLoginFields: React.FC<{
         required
         name='email'
         label='Email'
+        size='small'
         fullWidth
         value={formik.values.email}
         onChange={formik.handleChange}
@@ -183,6 +184,7 @@ const RegisterOrLoginFields: React.FC<{
         name='password'
         type='password'
         label='Password'
+        size='small'
         fullWidth
         value={formik.values.password}
         onChange={formik.handleChange}
