@@ -232,6 +232,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
       </Box>
       {modalOpen ? (
         <PurchaseModal
+          isAccordion={true}
           authState={authState}
           open={modalOpen}
           handleClose={handleClosePaymentModal}
@@ -245,6 +246,7 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
       ) : null}
       {isNavModalOpen ? (
         <RegisterOrLoginModal
+          isAccordion={false}
           authState={authState}
           open={isNavModalOpen}
           handleClose={handleCloseNavModalModal}

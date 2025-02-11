@@ -14,12 +14,14 @@ interface RegisterOrLoginModalProps {
   loginErrors: boolean;
   handleClose: (reason?: "backdropClick" | "escapeKeyDown") => void;
   setLoginErrors: React.Dispatch<React.SetStateAction<boolean>>;
+  isAccordion: boolean;
 }
 
 export const RegisterOrLoginModal: FC<RegisterOrLoginModalProps> = ({
   open,
   loginErrors,
   authState,
+  isAccordion,
   handleClose,
   setLoginErrors,
 }) => {
@@ -37,6 +39,7 @@ export const RegisterOrLoginModal: FC<RegisterOrLoginModalProps> = ({
   };
   return (
     <ReusableModal
+      isAccordion={isAccordion}
       loginErrors={loginErrors}
       open={open}
       maxWidth='sm'

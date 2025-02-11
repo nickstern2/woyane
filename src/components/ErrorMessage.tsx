@@ -2,7 +2,13 @@ import React from "react";
 import { Stack, Typography } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error"; // MUI Error Icon
 
-const ErrorMessageComponent = ({ showError }: { showError: boolean }) => {
+const ErrorMessageComponent = ({
+  showError,
+  isAccordion,
+}: {
+  showError: boolean;
+  isAccordion: boolean;
+}) => {
   if (!showError) return null;
 
   return (
@@ -11,6 +17,7 @@ const ErrorMessageComponent = ({ showError }: { showError: boolean }) => {
       spacing={1}
       alignItems='center'
       justifyContent='center'
+      paddingBottom={isAccordion ? 2 : 4}
       sx={{ color: "error.main" }}>
       <ErrorIcon fontSize='large' />
       <Typography fontWeight='bold'>
