@@ -16,7 +16,7 @@ export const handleLoginRegisterFormSubmit = async (
     await sendEmailVerification(user);
 
     // startPollingForEmailVerification(user);
-    toast.success("Verification email sent! 📩 Check your inbox.");
+    toast.success("Verification email sent! Check your inbox.");
     // Close if accessing from navbar modal
     handleClose && handleClose();
   } catch (error: any) {
@@ -31,12 +31,7 @@ export const handleLoginRegisterFormSubmit = async (
         handleClose && handleClose();
       } catch (signInError: any) {
         setLoginErrors(true);
-        toast.error(
-          "Failed to sign in. You have entered an invalid username or password."
-        );
       }
-    } else {
-      toast.error("Something went wrong! Try again.");
     }
   } finally {
     setSubmitting(false);
