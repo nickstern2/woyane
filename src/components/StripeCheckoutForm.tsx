@@ -42,7 +42,6 @@ import LockIcon from "@mui/icons-material/Lock";
 interface FormValues {
   firstName: string;
   lastName: string;
-  email: string;
   address: string;
   city: string;
   state: string;
@@ -53,7 +52,6 @@ interface FormValues {
 const CheckoutFormInitialValues = {
   firstName: "",
   lastName: "",
-  email: "",
   address: "",
   city: "",
   state: "",
@@ -95,7 +93,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   // Define Validation Schema//TODO: Add to and adjust these
   const validationSchema = Yup.object({
     name: Yup.string().required("Required"),
-    email: Yup.string().email("Invalid email").required("Required"),
     address: Yup.string().required("Required"),
     city: Yup.string().required("Required"),
     country: Yup.string().required("Required"),
@@ -134,7 +131,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         card: elements.getElement(CardElement)!,
         billing_details: {
           name: name,
-          email: values.email,
           address: {
             line1: values.address,
             city: values.city,
@@ -281,19 +277,9 @@ const CheckoutFields: React.FC<{
       </Stack>
 
       <TextField
-        name='email'
-        label='Email'
-        fullWidth
-        value={formik.values.email}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
-      />
-
-      <TextField
         name='address'
         label='Address'
+        size='small'
         fullWidth
         value={formik.values.address}
         onChange={formik.handleChange}
