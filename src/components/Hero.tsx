@@ -74,10 +74,12 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
     if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
       setModalOpen(false);
       setPurchaseType(purchaseType);
+      setLoginErrors(false);
     }
   };
   const handleCloseNavModalModal = () => {
     setIsNavModalOpen(false);
+    setLoginErrors(false);
   };
 
   // Sends scrollHeight to SquareSpace to adjust IFrame height dynamically
