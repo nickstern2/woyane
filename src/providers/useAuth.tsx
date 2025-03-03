@@ -10,19 +10,16 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { UserAuthState } from "../utils/auth-utils";
 
-// Define Context Interface
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   userData: any | null;
-  authState: UserAuthState; // New state for managing authentication
+  authState: UserAuthState;
   refetchUserData: (user: User) => Promise<void>;
 }
 
-// Create AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Custom Hook to Access Auth Context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -31,7 +28,6 @@ export const useAuth = () => {
   return context;
 };
 
-// AuthProvider Component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
@@ -39,11 +35,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [userData, setUserData] = useState<any | null>(null);
   const [authState, setAuthState] = useState<UserAuthState>(
     UserAuthState.NOT_SIGNED_IN
-  ); // New state
+  );
   const [loading, setLoading] = useState(true);
 
   // Fetch User Data from Firestore
   const fetchUserData = async (firebaseUser: User) => {
+    // TODO:is token needed. not used
     const token = await getIdToken(firebaseUser, true);
 
     const userDocRef = doc(db, "users", firebaseUser.uid);
