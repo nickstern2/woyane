@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormikConfig } from "formik";
+import { FormikConfig, FormikHelpers } from "formik";
 import { PurchaseModalValidationSchema } from "../utils/validations";
 import {
   getIsBillingSectionExpanded,
@@ -15,6 +15,12 @@ import { LoginFormInitialValues } from "../utils/consts";
 import { handleLoginRegisterFormSubmit } from "../forms/RegisterOrLoginForm/registe-or-login-utils";
 
 import { StripeCheckoutWrapper } from "./StripeCheckoutForm";
+import { Stripe, StripeElements } from "@stripe/stripe-js";
+// import {
+//   CheckoutFormValues,
+//   handlePaymentSubmit,
+// } from "../utils/payment-handlers";
+import AppConfig from "../app-config";
 
 interface PurchaseModalProps {
   open: boolean;
@@ -35,6 +41,11 @@ const handleAccordionToggle = (
   setter((prev) => !prev);
 };
 
+const projectId = AppConfig.FirebaseProjectId;
+const url = `https://us-central1-${projectId}.cloudfunctions.net/createPaymentIntent`;
+
+export type SubmitCheckoutFormRefCallback = { submitForm: () => void };
+
 const PurchaseModal: React.FC<PurchaseModalProps> = ({
   open,
   authState,
@@ -51,6 +62,17 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const [emailVerified, setEmailVerified] = useState(false);
   const [isSignUpSectionExpanded, setIsSignUpSectionExpanded] = useState(true);
   const isBillingSectionExpanded = getIsBillingSectionExpanded(authState);
+  const [isCheckoutProcessing, setIsCheckoutProcessing] = useState(false);
+
+  const checkoutFormSubmitRef =
+    React.useRef<SubmitCheckoutFormRefCallback>(null);
+  const handleSubmitCheckoutForm = async (): Promise<void> => {
+    console.log("!!Main handleSubmitCheckoutForm");
+    if (checkoutFormSubmitRef?.current) {
+      console.log("!!Main call checkout", checkoutFormSubmitRef?.current);
+      await checkoutFormSubmitRef.current.submitForm();
+    }
+  };
 
   console.log("!!isBillingSectionExpanded", isBillingSectionExpanded);
 
@@ -61,9 +83,8 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   console.log("!clientSecret", clientSecret);
 
   // const [pollingStarted, setPollingStarted] = useState(false); // State to control polling
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Track interval for cleanup
+  // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Track interval for cleanup
 
-  //
   // Find a way to pass onsubmit
   const loginFormUseFormikValues: FormikConfig<LoginFormInitialValuesType> = {
     initialValues: LoginFormInitialValues,
@@ -77,18 +98,35 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
     },
   };
 
-  const onSubmit = (formikOnSubmit: () => void) => {
-    formikOnSubmit();
-  };
+  // const createHandleSubmit = (
+  //   setIsProcessing: (processing: boolean) => void
+  // ) => {
+  //   return async (
+  //     values: CheckoutFormValues,
+  //     formikHelpers: FormikHelpers<CheckoutFormValues>,
+  //     stripe: Stripe | null,
+  //     elements: StripeElements | null
+  //   ) => {
+  //     await handlePaymentSubmit(
+  //       values,
+  //       formikHelpers,
+  //       stripe,
+  //       elements,
+  //       setIsProcessing,
+  //       url
+  //     );
+  //   };
+  // };
 
   return (
     <ReusableModal
+      isSubmitting={isCheckoutProcessing}
       isAccordion={isAccordion}
       loginErrors={loginErrors}
       title={`${purchaseActionText} Woyane`}
       open={open}
       handleClose={handleClose}
-      // customOnSubmit={() => }//todo: stripe onsubmit
+      customOnSubmit={handleSubmitCheckoutForm} //todo: stripe onsubmit
       tooltipDisabledMessage={tooltipDisabledMessage}
       authState={authState}
       confirmationSuccessTitle={purchaseActionText}>
@@ -103,12 +141,16 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         />
 
         <StripeCheckoutWrapper
-          amount={1000}
+          ref={checkoutFormSubmitRef}
+          handleClose={handleClose}
+          amount={1000} //TODO: get from BE?
           authState={authState}
           clientSecret={clientSecret}
           setClientSecret={setClientSecret}
           // handleAccordionToggle={handleAccordionToggle}
           isExpanded={isBillingSectionExpanded}
+          isProcessing={isCheckoutProcessing}
+          setIsProcessing={setIsCheckoutProcessing}
         />
       </>
     </ReusableModal>
