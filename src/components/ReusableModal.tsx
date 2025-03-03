@@ -29,6 +29,7 @@ interface ReusableModalProps {
   tooltipDisabledMessage?: string;
   authState: UserAuthState;
   isAccordion: boolean;
+  isSubmitting?: boolean;
 }
 
 const ReusableModal: React.FC<ReusableModalProps> = ({
@@ -36,6 +37,7 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
   title,
   children,
   confirmationSuccessTitle,
+  isSubmitting,
   hideActionButtons,
   hideConfirmationDialog,
   maxWidth,
@@ -62,7 +64,9 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
         onClose={(_, reason) => handleClose(reason)}>
         {/* Title */}
         {title ? (
-          <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
+          <DialogTitle sx={{ textAlign: "center" }}>
+            <Typography variant='h4'>{title}</Typography>
+          </DialogTitle>
         ) : null}
         {/* Body */}
         <DialogContent>{children}</DialogContent>
@@ -93,6 +97,7 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
               ) : (
                 <Button
                   type='submit'
+                  disabled={!!isSubmitting}
                   onClick={customOnSubmit ? customOnSubmit : () => undefined}
                   variant='contained'
                   color='primary'>
