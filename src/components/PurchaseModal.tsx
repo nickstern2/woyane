@@ -63,6 +63,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   // const [pollingStarted, setPollingStarted] = useState(false); // State to control polling
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Track interval for cleanup
 
+  //
   // Find a way to pass onsubmit
   const loginFormUseFormikValues: FormikConfig<LoginFormInitialValuesType> = {
     initialValues: LoginFormInitialValues,
