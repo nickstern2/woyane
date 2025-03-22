@@ -13,141 +13,300 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import cors from "cors";
 import Stripe from "stripe";
+import * as firestoreAdmin from "firebase-admin/firestore";
 
-// const stripe = new Stripe(
-//   functions.config().stripe[
-//     functions.config().mode === "production" ? "live_secret" : "test_secret"
-//   ]
-// );
-const stripe = new Stripe(functions.config().stripe.test_secret);
-console.log("!!HERE OTHER new test");
+const FieldValue = firestoreAdmin.FieldValue;
+const Timestamp = firestoreAdmin.Timestamp;
+
+// todo: Needs diff key for prod
+const stripe = new Stripe(functions.config().stripe.test_secret, {
+  apiVersion: "2025-01-27.acacia",
+});
+
 admin.initializeApp();
-const corsHandler = cors({ origin: true });
-if (process.env.FUNCTIONS_EMULATOR) {
-  console.log("! Running in Firebase Emulator Mode");
+const firestore = admin.firestore(); // Global Firestore instance
+const projectId = admin.instanceId().app.options.projectId;
+console.log("!projectId in BE", projectId);
+// export const BASE_URL = `https://us-central1-${projectId}.cloudfunctions.net`;
+// console.log("!BASE_URL In BE", BASE_URL);
+// export const BASE_URL =
+//   functions.config().env?.mode === "development"
+//     ? `http://127.0.0.1:5001/${projectId}/us-central1`
+//     : `https://us-central1-${projectId}.cloudfunctions.net`;
 
-  admin.firestore().settings({
-    host: "localhost:8080",
-    ssl: false, // Required to avoid SSL connection issues
-  });
+console.log("!! Running in", functions.config().env?.mode);
+// console.log("!!BASE_URL", BASE_URL);
+// const corsHandler = cors({ origin: true });
+const corsHandler = cors({
+  origin: [
+    "http://localhost:5173",
+    "https://www.woyanemovie.com",
+    "https://woyanemovie.com",
+  ], // Allow localhost + production
+  methods: ["GET", "POST", "OPTIONS"], // Explicitly allow necessary methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow content headers
+  credentials: true, // Allow credentials if needed
+});
 
-  process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
-}
-exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
-  console.log("!! HERE2:");
+const PRICES = {
+  rent: 5.99, // $5.99
+  purchase: 8.99, // $8.99
+};
+
+// Get prices for frontend
+exports.getPrices = functions.https.onRequest((req, res) => {
   corsHandler(req, res, async () => {
     try {
-      const { amount, currency, userId, isRented } = req.body;
-      // console.log("!! req:", req);
-      // console.log("!! res:", res);
-      console.log("!!submit BE isRented", isRented);
-      console.log("!!submit BE", amount, currency);
-      if (!amount || !currency) {
+      res.status(200).json(PRICES);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch prices" });
+    }
+  });
+});
+
+// TODO: Test that this works after firebase deploy --only functions
+const EXCHANGE_RATE_API_KEY = functions.config().exchangerateapi.key;
+const API_URL = `https://v6.exchangerate-api.com/v6/${EXCHANGE_RATE_API_KEY}/latest/USD`;
+
+exports.convertCurrency = functions.https.onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const targetCurrency = Array.isArray(req.query.targetCurrency)
+        ? req.query.targetCurrency[0].toString().toUpperCase()
+        : String(req.query.targetCurrency || "").toUpperCase();
+
+      const amount = parseFloat(
+        Array.isArray(req.query.amount)
+          ? req.query.amount[0].toString()
+          : String(req.query.amount || "0")
+      );
+      console.log(
+        "!!Strart conversion targetCurrency:",
+        targetCurrency,
+        "amount:",
+        amount
+      );
+      //  Ensure valid currency & amount
+      if (!targetCurrency || isNaN(amount) || amount <= 0) {
+        return res
+          .status(400)
+          .json({ error: "Invalid targetCurrency or amount" });
+      }
+
+      // Fetch exchange rates from API
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      console.log("!!conversion data", data);
+      if (data.result !== "success") {
+        return res
+          .status(500)
+          .json({ error: "Failed to fetch exchange rates" });
+      }
+
+      // Get conversion rate for the target currency
+      const rate = data.conversion_rates[targetCurrency];
+      if (!rate) {
+        return res.status(400).json({ error: "Invalid target currency" });
+      }
+
+      // Convert USD to target currency
+      const convertedAmount = (amount * rate).toFixed(2);
+
+      return res.status(200).json({
+        baseCurrency: "USD",
+        targetCurrency,
+        originalAmount: amount,
+        convertedAmount,
+        exchangeRate: rate,
+      });
+    } catch (error) {
+      console.error("Currency conversion error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+});
+
+async function getConvertedAmount(amountUSD: number, currency: string) {
+  console.log("!!projectId", projectId);
+  const URL = `https://us-central1-${projectId}.cloudfunctions.net/convertCurrency?amount=${amountUSD}&targetCurrency=${currency}`;
+  // const emulatorURL =  `http://127.0.0.1:5001/woyane-36a2f/us-central1/convertCurrency?amount=${amountUSD}&targetCurrency=${currency}`
+  try {
+    // TODO: Needs diff url for production
+    const response = await fetch(URL);
+    const data = await response.json();
+    return parseFloat(data.convertedAmount);
+  } catch (error) {
+    console.error("Currency conversion failed:", error);
+    return amountUSD; // Fallback to USD price if conversion fails
+  }
+}
+exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const { currency, isRented } = req.body;
+
+      const usdPrice = isRented ? PRICES.rent : PRICES.purchase;
+
+      const convertedAmount = await getConvertedAmount(usdPrice, currency);
+      const finalAmount = Math.round(convertedAmount * 100);
+
+      // TODO: Need to make a FE error for this
+      if (!convertedAmount) {
+        res.status(500).json({ error: "Failed to fetch exchange rate" });
+        return;
+      }
+
+      if (!usdPrice || !currency) {
         res.status(400).json({ error: "Missing payment amount or currency" });
         return;
       }
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount,
+        amount: finalAmount,
         currency,
         automatic_payment_methods: { enabled: true },
       });
 
-      console.log("!!paymentIntent", paymentIntent);
-      console.log("!!IS SUCCESS", paymentIntent.status === "succeeded");
-      // After successful payment
-      if (paymentIntent.status === "succeeded") {
-        console.log("!!paymentIntent succeeded");
-        const userRef = admin.firestore().collection("users").doc(userId);
-
-        const updateData = isRented
-          ? {
-              isRented: true,
-              rentalHistory: admin.firestore.FieldValue.arrayUnion({
-                rentalDate: admin.firestore.FieldValue.serverTimestamp(),
-              }),
-            }
-          : {
-              isPurchased: true,
-              purchaseHistory: admin.firestore.FieldValue.arrayUnion({
-                purchaseDate: admin.firestore.FieldValue.serverTimestamp(),
-              }),
-            };
-        console.log("!!updateData", updateData);
-        await userRef.update(updateData);
+      if (paymentIntent.status !== "succeeded") {
+        res.status(200).json({ clientSecret: paymentIntent.client_secret });
+        return;
       }
-
-      console.log("!!submit Success BE paymentIntent", paymentIntent);
       res.status(200).json({ clientSecret: paymentIntent.client_secret });
       return;
     } catch (error: any) {
-      console.log("!!submit Error BE", error, error?.message);
       res.status(500).json({ error: error?.message });
       return;
     }
   });
 });
 
-// Get User data including purchase/rental history and User Details such as isLoggedIn & isVerified
-export const getUserData = functions.https.onRequest(async (req, res) => {
-  const uid = req.query.uid as string;
+exports.updateUserDetailsAfterPurchase = functions.https.onRequest(
+  async (req, res) => {
+    corsHandler(req, res, async () => {
+      try {
+        const { userId, isRented } = req.body;
+        console.log(
+          "!!! updateUserDetailsAfterPurchase inside",
+          userId,
+          isRented
+        );
 
-  if (!uid) {
-    res.status(400).json({ error: "Missing user ID" });
-    return;
+        if (!userId) {
+          console.log("!Missing user ID");
+          res.status(400).json({ error: "Missing user ID" });
+          return;
+        }
+        const userRef = firestore.collection("users").doc(userId);
+
+        const updateData = isRented
+          ? {
+              isRented: true,
+              rentalHistory: FieldValue.arrayUnion({
+                rentalDate: Timestamp.now(),
+              }),
+            }
+          : {
+              isPurchased: true,
+              purchaseHistory: FieldValue.arrayUnion({
+                purchaseDate: Timestamp.now(),
+              }),
+            };
+
+        console.log("!!updateData", updateData);
+        await userRef.set(updateData, { merge: true });
+
+        res
+          .status(200)
+          .json({ success: true, message: "User purchase history updated" });
+      } catch (error) {
+        console.log("!!error", error);
+        console.error("Error updating user purchase history:", error);
+        res.status(500).json({ error: error });
+      }
+    });
   }
+);
 
-  try {
-    const userDoc = await admin.firestore().collection("users").doc(uid).get();
+exports.getSupportedCountries = functions.https.onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const countrySpecs = await stripe.countrySpecs.list();
 
-    if (!userDoc.exists) {
-      res.status(404).json({ error: "User not found" });
-      return;
+      console.log("!!countrySpecs", countrySpecs);
+
+      const formattedCountries = countrySpecs.data.map((country) => ({
+        country: country.id,
+        supportedCurrencies: country.supported_payment_currencies,
+      }));
+
+      res.status(200).json(formattedCountries);
+    } catch (error) {
+      console.error("Error fetching supported countries:", error);
+      res.status(500).json({ error: "Failed to fetch country data" });
     }
-
-    res.json(userDoc.data());
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: (error as Error).message || "Internal server error" });
-  }
+  });
 });
 
-// export const getUserData = functions.https.onRequest(async (req, res) => {
-//   const uid = req.query.uid as string;
-//   if (!uid) {
-//     return res.status(400).json({ error: "Missing user ID" });
-//   }
+const getSafeUserData = (
+  userData: FirebaseFirestore.DocumentData | undefined
+) => {
+  return {
+    isRented:
+      typeof userData?.isRented === "boolean" ? userData.isRented : false,
+    isPurchased:
+      typeof userData?.isPurchased === "boolean" ? userData.isPurchased : false,
+    rentalHistory: Array.isArray(userData?.rentalHistory)
+      ? userData.rentalHistory
+      : [],
+    purchaseHistory: Array.isArray(userData?.purchaseHistory)
+      ? userData.purchaseHistory
+      : [],
+    ...userData, // Preserve any other fields in the document
+  };
+};
 
-//   try {
-//     const userDoc = await admin.firestore().collection("users").doc(uid).get();
-//     if (!userDoc.exists) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-//     res.json(userDoc.data());
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-// export const getUserData = functions.https.onRequest(async (req, res) => {
-//   const uid = req.query.uid as string;
+//
+// TODO: look into this
+// functions.https.onCall
+exports.getUserData = functions.https.onRequest(async (req, res) => {
+  console.log("!!getUserData");
+  corsHandler(req, res, async () => {
+    console.log("!!getUserData IN CORS");
+    const authHeader = req.headers.authorization;
+    console.log("Authorization Header:", authHeader);
+    try {
+      const uid = req.query.uid as string;
 
-//   if (!uid) {
-//     return res.status(400).json({ error: "Missing user ID" });
-//   }
+      if (!uid) {
+        console.error("Missing UID in request.");
+        return res.status(400).json({ error: "Missing user ID" });
+      }
 
-//   try {
-//     const userDoc = await admin.firestore().collection("users").doc(uid).get();
+      console.log(`Fetching data for user UID: ${uid}`);
 
-//     if (!userDoc.exists) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
+      const userRef = admin.firestore().collection("users").doc(uid);
+      const userDoc = await userRef.get();
 
-//     return res.json(userDoc.data());
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ error: (error as Error).message || "Internal server error" });
-//   }
-// });
+      if (!userDoc.exists || !userDoc.data()) {
+        console.warn(`User exists but has no data. Returning default values.`);
+        // Return default values if user exists but has no data
+        return res.json({
+          isRented: false,
+          isPurchased: false,
+          rentalHistory: [],
+          purchaseHistory: [],
+        });
+      }
+
+      // Use helper function for safe data
+      const userData = getSafeUserData(userDoc.data());
+
+      console.log("User data retrieved successfully:", userData);
+
+      return res.json(userData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+});
