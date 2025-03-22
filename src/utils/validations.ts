@@ -8,3 +8,6 @@ export const PurchaseModalValidationSchema = Yup.object({
     .required("Password is required")
     .min(8, "Password is too short - 8 chars minimum"),
 });
+export const ForgotPasswordValidationSchema = Yup.object({
+  email: Yup.string().email().required("Email is required"),
+});
