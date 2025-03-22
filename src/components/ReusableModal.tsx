@@ -14,6 +14,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import ErrorMessageComponent from "./ErrorMessage";
 import { UserAuthState } from "../utils/auth-utils";
 import LockIcon from "@mui/icons-material/Lock";
+import { ModalSaveLoadingButton } from "./ReusableSucessButton";
 
 interface ReusableModalProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface ReusableModalProps {
   tooltipDisabledMessage?: string;
   authState: UserAuthState;
   isAccordion: boolean;
+  isSubmitting?: boolean;
 }
 
 const ReusableModal: React.FC<ReusableModalProps> = ({
@@ -36,6 +38,7 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
   title,
   children,
   confirmationSuccessTitle,
+  isSubmitting,
   hideActionButtons,
   hideConfirmationDialog,
   maxWidth,
@@ -62,7 +65,9 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
         onClose={(_, reason) => handleClose(reason)}>
         {/* Title */}
         {title ? (
-          <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
+          <DialogTitle sx={{ textAlign: "center" }}>
+            <Typography variant='h4'>{title}</Typography>
+          </DialogTitle>
         ) : null}
         {/* Body */}
         <DialogContent>{children}</DialogContent>
@@ -91,13 +96,15 @@ const ReusableModal: React.FC<ReusableModalProps> = ({
                   </span>
                 </Tooltip>
               ) : (
-                <Button
+                <ModalSaveLoadingButton
                   type='submit'
+                  isLoading={!!isSubmitting}
+                  disabled={!!isSubmitting}
                   onClick={customOnSubmit ? customOnSubmit : () => undefined}
                   variant='contained'
                   color='primary'>
                   {confirmationSuccessTitle ?? "Confirm"}
-                </Button>
+                </ModalSaveLoadingButton>
               )}
 
               <Button

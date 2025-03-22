@@ -13,8 +13,8 @@ import { LoginFormInitialValuesType } from "../utils/types";
 import ReusableModal from "./ReusableModal";
 import { LoginFormInitialValues } from "../utils/consts";
 import { handleLoginRegisterFormSubmit } from "../forms/RegisterOrLoginForm/registe-or-login-utils";
-
 import { StripeCheckoutWrapper } from "./StripeCheckoutForm";
+import AppConfig from "../app-config";
 
 interface PurchaseModalProps {
   open: boolean;
@@ -22,10 +22,9 @@ interface PurchaseModalProps {
   user: User | null;
   handleClose: (reason?: "backdropClick" | "escapeKeyDown") => void;
   handlePurchase: (type: "rent" | "buy") => void;
-  refetchUserData: (user: User) => Promise<void>;
   setLoginErrors: React.Dispatch<React.SetStateAction<boolean>>;
   authState: UserAuthState;
-  purchaseType: PurchaseType | null;
+  purchaseType: PurchaseType;
   isAccordion: boolean;
 }
 
@@ -35,6 +34,8 @@ const handleAccordionToggle = (
   setter((prev) => !prev);
 };
 
+export type SubmitCheckoutFormRefCallback = { submitForm: () => void };
+
 const PurchaseModal: React.FC<PurchaseModalProps> = ({
   open,
   authState,
@@ -43,14 +44,26 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   purchaseType,
   loginErrors,
   setLoginErrors,
-  refetchUserData,
   handleClose,
   handlePurchase,
 }) => {
+  console.log("!user", user);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [emailVerified, setEmailVerified] = useState(false);
   const [isSignUpSectionExpanded, setIsSignUpSectionExpanded] = useState(true);
   const isBillingSectionExpanded = getIsBillingSectionExpanded(authState);
+  const [isCheckoutProcessing, setIsCheckoutProcessing] = useState(false);
+  const [currency, setCurrency] = useState<string>("usd");
+
+  const checkoutFormSubmitRef =
+    React.useRef<SubmitCheckoutFormRefCallback>(null);
+  const handleSubmitCheckoutForm = async (): Promise<void> => {
+    console.log("!!Main handleSubmitCheckoutForm");
+    if (checkoutFormSubmitRef?.current) {
+      console.log("!!Main call checkout", checkoutFormSubmitRef?.current);
+      await checkoutFormSubmitRef.current.submitForm();
+    }
+  };
 
   console.log("!!isBillingSectionExpanded", isBillingSectionExpanded);
 
@@ -61,7 +74,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   console.log("!clientSecret", clientSecret);
 
   // const [pollingStarted, setPollingStarted] = useState(false); // State to control polling
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Track interval for cleanup
+  // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Track interval for cleanup
 
   // Find a way to pass onsubmit
   const loginFormUseFormikValues: FormikConfig<LoginFormInitialValuesType> = {
@@ -76,18 +89,15 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
     },
   };
 
-  const onSubmit = (formikOnSubmit: () => void) => {
-    formikOnSubmit();
-  };
-
   return (
     <ReusableModal
+      isSubmitting={isCheckoutProcessing}
       isAccordion={isAccordion}
       loginErrors={loginErrors}
       title={`${purchaseActionText} Woyane`}
       open={open}
       handleClose={handleClose}
-      // customOnSubmit={() => }//todo: stripe onsubmit
+      customOnSubmit={handleSubmitCheckoutForm} //todo: stripe onsubmit
       tooltipDisabledMessage={tooltipDisabledMessage}
       authState={authState}
       confirmationSuccessTitle={purchaseActionText}>
@@ -102,12 +112,15 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         />
 
         <StripeCheckoutWrapper
-          amount={1000}
+          ref={checkoutFormSubmitRef}
+          handleClose={handleClose}
           authState={authState}
           clientSecret={clientSecret}
           setClientSecret={setClientSecret}
-          // handleAccordionToggle={handleAccordionToggle}
           isExpanded={isBillingSectionExpanded}
+          isProcessing={isCheckoutProcessing}
+          setIsProcessing={setIsCheckoutProcessing}
+          purchaseType={purchaseType}
         />
       </>
     </ReusableModal>

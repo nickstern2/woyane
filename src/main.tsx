@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { AuthProvider } from "./providers/useAuth";
+// import { AuthProvider } from "./providers/useAuth";
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { AuthProvider } from "./providers/AuthProvider";
 // import StripeCheckoutForm from './StripeCheckoutForm';
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

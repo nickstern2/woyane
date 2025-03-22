@@ -8,7 +8,7 @@ import { RegisterOrLoginModal } from "./RegisterOrLoginModal";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import Player from "@vimeo/player";
-import { PurchaseType } from "../utils/auth-utils";
+import { canUserWatchFilm, PurchaseType } from "../utils/auth-utils";
 
 type HeroProps = {
   isNavModalOpen: boolean;
@@ -16,7 +16,12 @@ type HeroProps = {
 };
 
 const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
-  const { user, authState, refetchUserData } = useAuth();
+  const { user, authState, refetchUserData, userData } = useAuth();
+  console.log("!home userData", userData);
+
+  const canWatch = canUserWatchFilm(userData);
+  console.log("!canWatch", canWatch);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [loginErrors, setLoginErrors] = useState(false);
   const [purchaseType, setPurchaseType] = useState<PurchaseType | null>(null);
@@ -128,7 +133,29 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
   //   document.addEventListener("click", handleUserInteraction);
   //   return () => document.removeEventListener("click", handleUserInteraction);
   // }, []);
-  return (
+  return canWatch ? (
+    <>
+      <Box
+        sx={{
+          width: "100%",
+          aspectRatio: "18 / 9", // Maintains consistent height based on width
+          overflow: "hidden", // Prevents scrollbars by clipping overflow
+        }}>
+        <Box
+          id='vimeo-player'
+          component='iframe'
+          sx={{
+            width: "100%",
+            height: "100%",
+          }}
+          src='https://player.vimeo.com/video/869957112?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479'
+          frameBorder='0'
+          allow='autoplay; fullscreen; picture-in-picture'
+          allowFullScreen
+        />
+      </Box>
+    </>
+  ) : (
     <>
       <Box
         sx={{
@@ -232,14 +259,13 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
           </IconButton>
         </Box>
       </Box>
-      {modalOpen ? (
+      {modalOpen && purchaseType ? (
         <PurchaseModal
           isAccordion={true}
           authState={authState}
           open={modalOpen}
           handleClose={handleClosePaymentModal}
-          handlePurchase={handlePurchase}
-          refetchUserData={refetchUserData} //TODO: think can be removed unless manual query works
+          handlePurchase={handlePurchase} //TODO: think can be removed unless manual query works
           user={user}
           loginErrors={loginErrors}
           setLoginErrors={setLoginErrors}
