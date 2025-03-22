@@ -1,4 +1,3 @@
-import { FormikConfig } from "formik";
 import { LoginFormInitialValuesType } from "./types";
 
 export const title = "Woyane";
@@ -10,3 +9,13 @@ export const LoginFormInitialValues: LoginFormInitialValuesType = {
   email: "",
   password: "",
 };
+
+export enum QueryNames {
+  createPaymentIntent = "createPaymentIntent",
+  getUserData = "getUserData",
+  updateUserDetailsAfterPurchase = "updateUserDetailsAfterPurchase",
+}
+export enum QueryType {
+  POST = "POST",
+  GET = "GET",
+}
