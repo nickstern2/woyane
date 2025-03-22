@@ -5,7 +5,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "watch": "tsc --watch",
-    "start:emulators": "firebase emulators:start --only functions",
+    "start:emulators": "firebase emulators:start",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
