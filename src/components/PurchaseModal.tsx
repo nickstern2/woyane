@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormikConfig, FormikHelpers } from "formik";
+import { FormikConfig } from "formik";
 import { PurchaseModalValidationSchema } from "../utils/validations";
 import {
   getIsBillingSectionExpanded,
@@ -13,13 +13,7 @@ import { LoginFormInitialValuesType } from "../utils/types";
 import ReusableModal from "./ReusableModal";
 import { LoginFormInitialValues } from "../utils/consts";
 import { handleLoginRegisterFormSubmit } from "../forms/RegisterOrLoginForm/registe-or-login-utils";
-
 import { StripeCheckoutWrapper } from "./StripeCheckoutForm";
-import { Stripe, StripeElements } from "@stripe/stripe-js";
-// import {
-//   CheckoutFormValues,
-//   handlePaymentSubmit,
-// } from "../utils/payment-handlers";
 import AppConfig from "../app-config";
 
 interface PurchaseModalProps {
@@ -28,10 +22,9 @@ interface PurchaseModalProps {
   user: User | null;
   handleClose: (reason?: "backdropClick" | "escapeKeyDown") => void;
   handlePurchase: (type: "rent" | "buy") => void;
-  refetchUserData: (user: User) => Promise<void>;
   setLoginErrors: React.Dispatch<React.SetStateAction<boolean>>;
   authState: UserAuthState;
-  purchaseType: PurchaseType | null;
+  purchaseType: PurchaseType;
   isAccordion: boolean;
 }
 
@@ -40,9 +33,6 @@ const handleAccordionToggle = (
 ) => {
   setter((prev) => !prev);
 };
-
-const projectId = AppConfig.FirebaseProjectId;
-const url = `https://us-central1-${projectId}.cloudfunctions.net/createPaymentIntent`;
 
 export type SubmitCheckoutFormRefCallback = { submitForm: () => void };
 
@@ -54,15 +44,16 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   purchaseType,
   loginErrors,
   setLoginErrors,
-  refetchUserData,
   handleClose,
   handlePurchase,
 }) => {
+  console.log("!user", user);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [emailVerified, setEmailVerified] = useState(false);
   const [isSignUpSectionExpanded, setIsSignUpSectionExpanded] = useState(true);
   const isBillingSectionExpanded = getIsBillingSectionExpanded(authState);
   const [isCheckoutProcessing, setIsCheckoutProcessing] = useState(false);
+  const [currency, setCurrency] = useState<string>("usd");
 
   const checkoutFormSubmitRef =
     React.useRef<SubmitCheckoutFormRefCallback>(null);
@@ -98,26 +89,6 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
     },
   };
 
-  // const createHandleSubmit = (
-  //   setIsProcessing: (processing: boolean) => void
-  // ) => {
-  //   return async (
-  //     values: CheckoutFormValues,
-  //     formikHelpers: FormikHelpers<CheckoutFormValues>,
-  //     stripe: Stripe | null,
-  //     elements: StripeElements | null
-  //   ) => {
-  //     await handlePaymentSubmit(
-  //       values,
-  //       formikHelpers,
-  //       stripe,
-  //       elements,
-  //       setIsProcessing,
-  //       url
-  //     );
-  //   };
-  // };
-
   return (
     <ReusableModal
       isSubmitting={isCheckoutProcessing}
@@ -143,14 +114,13 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         <StripeCheckoutWrapper
           ref={checkoutFormSubmitRef}
           handleClose={handleClose}
-          amount={1000} //TODO: get from BE?
           authState={authState}
           clientSecret={clientSecret}
           setClientSecret={setClientSecret}
-          // handleAccordionToggle={handleAccordionToggle}
           isExpanded={isBillingSectionExpanded}
           isProcessing={isCheckoutProcessing}
           setIsProcessing={setIsCheckoutProcessing}
+          purchaseType={purchaseType}
         />
       </>
     </ReusableModal>
