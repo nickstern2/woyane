@@ -133,24 +133,27 @@ const Hero: React.FC<HeroProps> = ({ isNavModalOpen, setIsNavModalOpen }) => {
   //   document.addEventListener("click", handleUserInteraction);
   //   return () => document.removeEventListener("click", handleUserInteraction);
   // }, []);
-  // TODO: Change url to actual video
   return canWatch ? (
     <>
       <Box
-        id='vimeo-player'
-        component='iframe'
         sx={{
           width: "100%",
-          aspectRatio: "18 / 9",
-          objectFit: "cover",
-          // pointerEvents: "none",
-          gridArea: "1 / 1", // Keeps video as the background
-        }}
-        src='https://player.vimeo.com/video/869957112?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479'
-        frameBorder='0'
-        allow='autoplay; fullscreen'
-        allowFullScreen
-      />
+          aspectRatio: "18 / 9", // Maintains consistent height based on width
+          overflow: "hidden", // Prevents scrollbars by clipping overflow
+        }}>
+        <Box
+          id='vimeo-player'
+          component='iframe'
+          sx={{
+            width: "100%",
+            height: "100%",
+          }}
+          src='https://player.vimeo.com/video/869957112?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479'
+          frameBorder='0'
+          allow='autoplay; fullscreen; picture-in-picture'
+          allowFullScreen
+        />
+      </Box>
     </>
   ) : (
     <>
